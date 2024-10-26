@@ -5,7 +5,7 @@ from src.main import create_mock_dataset, train_model
 
 class TestClassificationModel(unittest.TestCase):
 
-    def test_create_mock_dataset(self):
+    def test_create_mock_dataset(self)
         X, y = create_mock_dataset(100)
         self.assertEqual(X.shape, (100, 2), "El dataset debe tener 100 muestras y 2 características")
         self.assertEqual(len(y), 100, "El vector de etiquetas debe tener 100 elementos")
