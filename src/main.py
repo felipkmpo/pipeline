@@ -1,30 +1,33 @@
-import unittest
 import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score
-from src.main import create_mock_dataset, train_model
 
-class TestClassificationModel(unittest.TestCase):
+# Generar un dataset mock
+def create_mock_dataset(num_samples=100):
+    np.random.seed(42)
+    X = np.random.rand(num_samples, 2)  # 2 características
+    y = (X[:, 0] + X[:, 1] > 1).astype(int)  # Clase 1 si la suma de las características es > 1
+    return pd.DataFrame(X, columns=['feature1', 'feature2']), y
 
-    def test_create_mock_dataset(self):
-        X, y = create_mock_dataset(100)
-        self.assertEqual(X.shape, (100, 2), "El dataset debe tener 100 muestras y 2 características")
-        self.assertEqual(len(y), 100, "El vector de etiquetas debe tener 100 elementos")
-        self.assertEqual(np.unique(y).tolist(), [0, 1], "Las clases deben ser 0 y 1")
+# Entrenar el modelo
+def train_model(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    model = RandomForestClassifier(random_state=42)
+    model.fit(X_train, y_train)
+    
+    y_pred = model.predict(X_test)
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
 
-    def test_train_model_accuracy(self):
-        X, y = create_mock_dataset(100)
-        model = train_model(X, y)  # Guarda el modelo para evaluar
-        y_pred = model.predict(X)
-        accuracy = accuracy_score(y, y_pred)
-        self.assertGreaterEqual(accuracy, 0.5, "La precisión debe ser al menos 0.5")
+    print(f'Accuracy: {accuracy:.2f}')
+    print(f'Precision: {precision:.2f}')
+    
+    return model  # Devuelve el modelo entrenado
 
-    def test_train_model_precision(self):
-        X, y = create_mock_dataset(100)
-        model = train_model(X, y)  # Guarda el modelo para evaluar
-        y_pred = model.predict(X)
-        precision = precision_score(y, y_pred)
-        self.assertGreaterEqual(precision, 0.5, "La precisión debe ser al menos 0.5")
-
-# Ejecutar las pruebas solo si este archivo se ejecuta directamente
 if __name__ == "__main__":
-    unittest.main()
+    X, y = create_mock_dataset()
+    train_model(X, y)
